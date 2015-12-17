@@ -11,6 +11,18 @@ namespace OpenStack.Synchronous
     /// </summary>
     public static class ComputeServiceExtensions_v2_1
     {
+        /// <inheritdoc cref="ComputeService.ListSupportedVersionsAsync" />
+        public static IEnumerable<ApiVersion> ListSupportedVersions(this ComputeService service)
+        {
+            return service.ListSupportedVersionsAsync().ForceSynchronous();
+        }
+
+        /// <inheritdoc cref="ComputeService.SupportsMicroversionAsync" />
+        public static bool SupportsMicroversion(this ComputeService service, string version)
+        {
+            return service.SupportsMicroversionAsync(vesion).ForceSynchronous();
+        }
+
         #region Servers
         /// <inheritdoc cref="ComputeService.GetServerAsync" />
         public static Server GetServer(this ComputeService service, Identifier serverId)

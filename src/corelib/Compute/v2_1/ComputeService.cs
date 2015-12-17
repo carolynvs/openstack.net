@@ -27,6 +27,18 @@ namespace OpenStack.Compute.v2_1
             _computeApi = new ComputeApiBuilder(ServiceType.Compute, authenticationProvider, region);
         }
 
+        /// <inheritdoc cref="ComputeApiBuilder.ListSupportedVersions{T}" />
+        public async Task<IEnumerable<ApiVersion>> ListSupportedVersionsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return await _computeApi.ListSupportedVersions<ApiVersionCollection>(cancellationToken);
+        }
+
+        /// <inheritdoc cref="ComputeApiBuilder.SupportsMicroversionAsync" />
+        public Task<bool> SupportsMicroversionAsync(string version, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return _computeApi.SupportsMicroversionAsync(version, cancellationToken);
+        }
+
         #region Servers
 
         /// <inheritdoc cref="ComputeApiBuilder.GetServerAsync{T}" />

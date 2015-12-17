@@ -30,7 +30,6 @@ namespace OpenStack
             return WaitForStatusAsync<TResource, TStatus>(resourceId, new[] {status}, getResource, refreshDelay, timeout, progress, cancellationToken);
         }
 
-
         /// <summary>
         /// Waits for the server to reach the specified status.
         /// </summary>
@@ -107,6 +106,13 @@ namespace OpenStack
             {
                 progress?.Report(true);
             }
+        }
+
+        /// <summary />
+        internal static bool IsVersionSupported(this ISupportMicroversions service, decimal version)
+        {
+            IEnumerable<IHaveMicroversions> versions = service.GetVersions();
+            return versions.Any(v => v.MinimumVersion <= version && version >= v.Version);
         }
     }
 }

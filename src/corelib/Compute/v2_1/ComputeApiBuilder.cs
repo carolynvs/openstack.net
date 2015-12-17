@@ -58,12 +58,32 @@ namespace OpenStack.Compute.v2_1
         string ISupportMicroversions.MicroversionHeader => "X-OpenStack-Nova-API-Version";
 
         /// <summary />
-        public string Microversion { get; }
+        string ISupportMicroversions.Microversion { get; }
 
-        private void SetOwner(IServiceResource resource)
+        Task<IEnumerable<IHaveMicroversions>> ISupportMicroversions.GetVersionsAsync(CancellationToken cancellationToken)
         {
-            resource.PropogateOwner(this);
+            throw new NotImplementedException();
         }
+
+        /// <summary />
+        public virtual Task<T> Get<T>(CancellationToken cancellationToken = default(CancellationToken))
+            where T : IHaveMicroversions
+        {
+            return BuildListSupportedVersions(cancellationToken)
+                .SendAsync()
+                .ReceiveJson<T>();
+        }
+
+        /// <summary />
+        public virtual async Task<PreparedRequest> BuildListSupportedVersions(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            Url endpoint = await UrlBuilder.GetEndpoint(cancellationToken).ConfigureAwait(false);
+            
+            return endpoint.ResetToRoot()
+                .Authenticate(AuthenticationProvider)
+                .PrepareGet(cancellationToken);
+        }
+
 
         #region Servers
 
@@ -74,7 +94,7 @@ namespace OpenStack.Compute.v2_1
             var result = await BuildGetServerAsync(serverId, cancellationToken)
                 .SendAsync()
                 .ReceiveJson<T>();
-            SetOwner(result);
+            result.PropogateOwner(this);
             return result;
         }
 
@@ -107,7 +127,7 @@ namespace OpenStack.Compute.v2_1
             where T : IServiceResource
         {
             var result = await BuildCreateServerAsync(server, cancellationToken).SendAsync().ReceiveJson<T>();
-            SetOwner(result);
+            result.PropogateOwner(this);
             return result;
         }
 
@@ -173,7 +193,7 @@ namespace OpenStack.Compute.v2_1
 
         /// <summary />
         public virtual async Task<TPage>  ListServersAsync<TPage>(IQueryStringBuilder queryString, CancellationToken cancellationToken = default(CancellationToken))
-            where TPage : IPageBuilder<TPage>, IServiceResource
+            where TPage : IPageBuilder<TPage>, IEnumerable<IServiceResource>
         {
             Url initialRequestUrl = await BuildListServersUrlAsync(queryString, cancellationToken);
             return await ListServersAsync<TPage>(initialRequestUrl, cancellationToken);
@@ -181,7 +201,7 @@ namespace OpenStack.Compute.v2_1
 
         /// <summary />
         public virtual async Task<TPage> ListServersAsync<TPage>(Url url, CancellationToken cancellationToken)
-            where TPage : IPageBuilder<TPage>, IServiceResource
+            where TPage : IPageBuilder<TPage>, IEnumerable<IServiceResource>
         {
             var results = await url
                 .Authenticate(AuthenticationProvider)
@@ -191,7 +211,7 @@ namespace OpenStack.Compute.v2_1
                 .ReceiveJson<TPage>();
 
             results.SetNextPageHandler(ListServersAsync<TPage>);
-            SetOwner(results);
+            results.PropogateOwner(this);
 
             return results;
         }
@@ -208,7 +228,7 @@ namespace OpenStack.Compute.v2_1
 
         /// <summary />
         public virtual async Task<TPage> ListServerDetailsAsync<TPage>(IQueryStringBuilder queryString, CancellationToken cancellationToken = default(CancellationToken))
-            where TPage : IPageBuilder<TPage>, IServiceResource
+            where TPage : IPageBuilder<TPage>, IEnumerable<IServiceResource>
         {
             Url initialRequestUrl = await BuildListServerDetailsUrlAsync(queryString, cancellationToken);
             return await ListServersAsync<TPage>(initialRequestUrl, cancellationToken);
@@ -226,7 +246,7 @@ namespace OpenStack.Compute.v2_1
                 .ReceiveJson<TPage>();
 
             results.SetNextPageHandler(ListServerDetailsAsync<TPage>);
-            SetOwner(results);
+            results.PropogateOwner(this);
             return results;
         }
 
@@ -257,7 +277,7 @@ namespace OpenStack.Compute.v2_1
             where T : IServiceResource
         {
             var result = await BuildUpdateServerAsync(serverId, server, cancellationToken).SendAsync().ReceiveJson<T>();
-            SetOwner(result);
+            result.PropogateOwner(this);
             return result;
         }
 
@@ -475,7 +495,7 @@ namespace OpenStack.Compute.v2_1
 
         /// <summary />
         public virtual async Task<T> ListServerActionsAsync<T>(string serverId, CancellationToken cancellationToken = default(CancellationToken))
-            where T : IServiceResource
+            where T : IEnumerable<IServiceResource>
         {
             var results = await BuildListServerActionsAsync(serverId, cancellationToken).SendAsync().ReceiveJson<T>();
             results.PropogateOwner(this);
@@ -534,7 +554,7 @@ namespace OpenStack.Compute.v2_1
             var result = await BuildGetFlavorAsync(flavorId, cancellationToken)
                 .SendAsync()
                 .ReceiveJson<T>();
-            SetOwner(result);
+            result.PropogateOwner(this);
             return result;
         }
 
@@ -552,12 +572,12 @@ namespace OpenStack.Compute.v2_1
 
         /// <summary />
         public virtual async Task<T> ListFlavorsAsync<T>(CancellationToken cancellationToken = default(CancellationToken))
-            where T : IServiceResource
+            where T : IEnumerable<IServiceResource>
         {
             var result = await BuildListFlavorsAsync(cancellationToken)
                 .SendAsync()
                 .ReceiveJson<T>();
-            SetOwner(result);
+            result.PropogateOwner(this);
             return result;
         }
 
@@ -575,12 +595,12 @@ namespace OpenStack.Compute.v2_1
 
         /// <summary />
         public virtual async Task<T> ListFlavorDetailsAsync<T>(CancellationToken cancellationToken = default(CancellationToken))
-            where T : IServiceResource
+            where T : IEnumerable<IServiceResource>
         {
             var result = await BuildListFlavorDetailsAsync(cancellationToken)
                 .SendAsync()
                 .ReceiveJson<T>();
-            SetOwner(result);
+            result.PropogateOwner(this);
             return result;
         }
 
@@ -606,7 +626,7 @@ namespace OpenStack.Compute.v2_1
             var result = await BuildGetImageAsync(imageId, cancellationToken)
                 .SendAsync()
                 .ReceiveJson<T>();
-            SetOwner(result);
+            result.PropogateOwner(this);
             return result;
         }
 
@@ -697,7 +717,7 @@ namespace OpenStack.Compute.v2_1
 
         /// <summary />
         public virtual async Task<TPage> ListImagesAsync<TPage>(IQueryStringBuilder queryString, CancellationToken cancellationToken = default(CancellationToken))
-            where TPage : IPageBuilder<TPage>, IServiceResource
+            where TPage : IPageBuilder<TPage>, IEnumerable<IServiceResource>
         {
             Url initialRequestUrl = await BuildListImagesUrlAsync(queryString, cancellationToken);
             return await ListImagesAsync<TPage>(initialRequestUrl, cancellationToken);
@@ -705,7 +725,7 @@ namespace OpenStack.Compute.v2_1
 
         /// <summary />
         public virtual async Task<TPage> ListImagesAsync<TPage>(Url url, CancellationToken cancellationToken)
-            where TPage : IPageBuilder<TPage>, IServiceResource
+            where TPage : IPageBuilder<TPage>, IEnumerable<IServiceResource>
         {
             var results = await url
                 .Authenticate(AuthenticationProvider)
@@ -715,7 +735,7 @@ namespace OpenStack.Compute.v2_1
                 .ReceiveJson<TPage>();
 
             results.SetNextPageHandler(ListImagesAsync<TPage>);
-            SetOwner(results);
+            results.PropogateOwner(this);
 
             return results;
         }
@@ -732,7 +752,7 @@ namespace OpenStack.Compute.v2_1
 
         /// <summary />
         public virtual async Task<TPage> ListImageDetailsAsync<TPage>(IQueryStringBuilder queryString, CancellationToken cancellationToken = default(CancellationToken))
-            where TPage : IPageBuilder<TPage>, IServiceResource
+            where TPage : IPageBuilder<TPage>, IEnumerable<IServiceResource>
         {
             Url initialRequestUrl = await BuildListImageDetailsUrlAsync(queryString, cancellationToken);
             return await ListImagesAsync<TPage>(initialRequestUrl, cancellationToken);
@@ -740,7 +760,7 @@ namespace OpenStack.Compute.v2_1
 
         /// <summary />
         public virtual async Task<TPage> ListImageDetailsAsync<TPage>(Url url, CancellationToken cancellationToken)
-            where TPage : IPageBuilder<TPage>, IServiceResource
+            where TPage : IPageBuilder<TPage>, IEnumerable<IServiceResource>
         {
             var results = await url
                 .Authenticate(AuthenticationProvider)
@@ -750,7 +770,7 @@ namespace OpenStack.Compute.v2_1
                 .ReceiveJson<TPage>();
 
             results.SetNextPageHandler(ListImageDetailsAsync<TPage>);
-            SetOwner(results);
+            results.PropogateOwner(this);
             return results;
         }
 
@@ -771,7 +791,7 @@ namespace OpenStack.Compute.v2_1
             var result = await BuildUpdateImageMetadataAsync(imageId, metadata, overwrite, cancellationToken)
                 .SendAsync()
                 .ReceiveJson<T>();
-            SetOwner(result);
+            result.PropogateOwner(this);
             return result;
         }
 
@@ -940,7 +960,7 @@ namespace OpenStack.Compute.v2_1
             T result = await BuildAttachVolumeAsync(serverId, request, cancellationToken)
                 .SendAsync()
                 .ReceiveJson<T>();
-            SetOwner(result);
+            result.PropogateOwner(this);
             return result;
         }
 

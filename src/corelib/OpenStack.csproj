@@ -94,6 +94,7 @@
     <Compile Include="Compute\v2_1\Actions\StopServerRequest.cs" />
     <Compile Include="Compute\v2_1\AddressType.cs" />
     <Compile Include="Compute\v2_1\Flavor.cs" />
+    <Compile Include="Compute\v2_1\ApiVersion.cs" />
     <Compile Include="Compute\v2_1\ImageMetadataExtensions.cs" />
     <Compile Include="Compute\v2_1\ImageExtensions.cs" />
     <Compile Include="Compute\v2_1\Image.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="Compute\v2_1\SchedulerHints.cs" />
     <Compile Include="Compute\v2_1\Serialization\AddressType.cs" />
     <Compile Include="Compute\v2_1\Serialization\DiskConfiguration.cs" />
+    <Compile Include="Compute\v2_1\Serialization\ApiVersionCollection.cs" />
     <Compile Include="Compute\v2_1\Serialization\ServerEventCollection.cs" />
     <Compile Include="Compute\v2_1\Serialization\ImageStatus.cs" />
     <Compile Include="Compute\v2_1\Serialization\ImageType.cs" />
@@ -180,6 +182,7 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Flurl\PreparedRequest.cs" />
     <Compile Include="Identifier.cs" />
+    <Compile Include="ISupportMicroversions.cs" />
     <Compile Include="Networking\IPVersion.cs" />
     <Compile Include="Networking\NamespaceDoc.cs" />
     <Compile Include="Networking\v2\AllowedAddress.cs" />
@@ -823,7 +826,6 @@
     <Compile Include="Serialization\IdentifierConverter.cs" />
     <Compile Include="Serialization\IHaveExtraData.cs" />
     <Compile Include="Serialization\IQueryStringBuilder.cs" />
-    <Compile Include="Serialization\ISupportMicroversions.cs" />
     <Compile Include="Serialization\JsonConverterWithConstructorAttribute.cs" />
     <Compile Include="Serialization\OpenStackContractResolver.cs" />
     <Compile Include="Serialization\Page.cs" />
